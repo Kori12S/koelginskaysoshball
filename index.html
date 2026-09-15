@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>KoelginskayaSOSHValuty</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    body { background:#f2f6fe; padding:1rem; min-height:100vh; display:flex; justify-content:center; align-items:flex-start; }
+    .app { max-width:500px; width:100%; background:white; border-radius:2rem; box-shadow:0 20px 40px -10px rgba(0,20,40,0.2); padding:1.5rem 1.2rem; }
+    .head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:0.5rem; gap:0.5rem; }
+    .logo { display:flex; align-items:center; gap:0.5rem; cursor:pointer; }
+    .star { background:#fbbf24; width:44px; height:44px; border-radius:44px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; box-shadow:0 6px 12px rgba(251,191,36,0.3); }
+    .brand { font-weight:700; font-size:1.3rem; line-height:1.2; }
+    .brand span { color:#2563eb; }
+    .brand small { display:block; font-size:0.5rem; color:#64748b; }
+    .user-area { display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; }
+    .user-badge { background:#eef2ff; padding:0.2rem 0.6rem 0.2rem 0.4rem; border-radius:40px; display:flex; align-items:center; gap:0.3rem; font-weight:500; font-size:0.8rem; cursor:pointer; }
+    .avatar-img { width:28px; height:28px; border-radius:50%; object-fit:cover; border:2px solid #2563eb; }
+    .avatar-placeholder { width:28px; height:28px; border-radius:50%; background:#dbeafe; display:flex; align-items:center; justify-content:center; font-size:1rem; color:#2563eb; border:2px solid #2563eb; }
+    .btn-auth { border:none; color:white; padding:0.35rem 1rem; border-radius:40px; font-weight:500; font-size:0.8rem; cursor:pointer; }
+    .btn-login { background:#2563eb; }
+    .btn-register { background:#16a34a; }
+    .btn-logout { background:#dc2626; }
+    .tabs { display:flex; flex-wrap:wrap; gap:0.2rem; margin:0.8rem 0 1rem; border-bottom:1px solid #e6edf5; padding-bottom:0.5rem; }
+    .tab-btn { background:transparent; border:none; padding:0.35rem 0.7rem; border-radius:40px; font-weight:500; font-size:0.75rem; color:#475569; cursor:pointer; }
+    .tab-btn.active { background:#dbeafe; color:#1e4f8a; }
+    .tab-btn i { margin-right:0.2rem; }
+    .card { background:#f8faff; border-radius:1.2rem; padding:1rem 1.2rem; margin-bottom:1rem; }
+    .card-title { font-weight:600; font-size:1.1rem; margin-bottom:0.5rem; display:flex; justify-content:space-between; }
+    .btn { background:#2563eb; border:none; color:white; padding:0.5rem 1.2rem; border-radius:40px; font-weight:500; font-size:0.9rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; }
+    .btn-success { background:#16a34a; }
+    .btn-danger { background:#dc2626; }
+    .btn-sm { padding:0.3rem 0.8rem; font-size:0.8rem; }
+    .flex { display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center; }
+    .mt-1 { margin-top:0.8rem; }
+    .badge { background:#e2e8f0; padding:0.2rem 0.8rem; border-radius:40px; font-size:0.8rem; }
+    .text-muted { color:#64748b; font-size:0.8rem; }
+    .hidden { display:none !important; }
+    input, select, textarea { width:100%; padding:0.7rem 1rem; border:1px solid #d1d9e6; border-radius:1.2rem; font-size:0.95rem; background:white; margin-bottom:0.7rem; }
+    textarea { min-height:60px; resize:vertical; }
+    label { font-weight:500; font-size:0.9rem; display:block; margin-bottom:0.2rem; }
+    .file-upload { border:1px dashed #94a3b8; border-radius:1.2rem; padding:0.8rem; text-align:center; cursor:pointer; background:#f8fafc; }
+    .toast { background:#0f172a; color:white; padding:0.8rem 1.2rem; border-radius:2rem; position:sticky; bottom:0; text-align:center; margin-top:1rem; }
+    .qr-container { background:#eef2ff; border-radius:1rem; padding:1rem; text-align:center; display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+    #qrcode { background:white; padding:8px; border-radius:12px; display:inline-block; }
+    .task-item, .shop-item, .student-item { display:flex; justify-content:space-between; align-items:center; padding:0.4rem 0; border-bottom:1px solid #e9edf4; }
+    .task-item:last-child, .shop-item:last-child, .student-item:last-child { border-bottom:none; }
+    .student-item .avatar-img { width:30px; height:30px; margin-right:0.3rem; }
+    .student-item .avatar-placeholder { width:30px; height:30px; margin-right:0.3rem; font-size:0.8rem; }
+    .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:100; padding:1rem; }
+    .modal { background:white; border-radius:1.5rem; padding:1.5rem; max-width:400px; width:100%; }
+    .modal h3 { margin-bottom:1rem; }
+    .owner-block { border:2px dashed #fbbf24 !important; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="head">
+    <div class="logo">
+      <div class="star">⭐</div>
+      <div class="brand">Школьная<span>Валюта</span><small>KoelginskayaSOSHValuty</small></div>
+    </div>
+    <div class="user-area" id="userArea"></div>
+  </div>
+
+  <div class="tabs" id="navTabs"></div>
+
+  <!-- ГЛАВНАЯ -->
+  <div id="pageHome" class="page-content">
+    <div class="card">
+      <div class="card-title"><span>Привет, <span id="greetName">гость</span>!</span> <span class="badge" id="classBadge">—</span></div>
+      <div style="font-size:2rem; font-weight:700;">🏅 <span id="balanceDisplay">0</span> баллов</div>
+    </div>
+    <div class="qr-container"><div id="qrcode"></div><span style="font-size:0.9rem;font-weight:500;">KoelginskayaSOSHValuty</span></div>
+    <div class="card"><i class="fas fa-clock"></i> Последние начисления: <span id="lastTransaction">—</span></div>
+  </div>
+
+  <!-- ЗАРАБОТАТЬ -->
+  <div id="pageEarn" class="page-content hidden">
+    <div class="card">
+      <h3><i class="fas fa-pen"></i> Заявка на баллы</h3>
+      <label>Тип дела</label><select id="taskType"></select>
+      <label>Описание</label><textarea id="taskDesc" placeholder="Коротко опиши, что сделал"></textarea>
+      <label>Фото дела (обязательно)</label>
+      <div class="file-upload" id="photoUpload"><i class="fas fa-camera"></i> <span id="photoLabel">Нажми, чтобы загрузить фото</span><input type="file" accept="image/*" id="photoInput" style="display:none"></div>
+      <button class="btn" id="submitEarnBtn"><i class="fas fa-paper-plane"></i> Отправить заявку</button>
+    </div>
+
+    <!-- ВЛАДЕЛЕЦ: управление заданиями -->
+    <div class="card owner-only hidden" id="ownerTaskManager" style="border:2px dashed #fbbf24;">
+      <div class="flex"><i class="fas fa-star" style="color:#fbbf24;"></i> <b>Владелец: управление заданиями</b></div>
+      <div class="flex">
+        <input type="text" id="newTaskName" placeholder="Название задания" style="flex:1;">
+        <input type="number" id="newTaskPoints" placeholder="Баллы" style="width:80px;">
+      </div>
+      <button class="btn btn-sm" id="addTaskBtn"><i class="fas fa-plus"></i> Добавить задание</button>
+      <hr style="margin:0.5rem 0;">
+      <div id="taskList"></div>
+    </div>
+  </div>
+
+  <!-- МАГАЗИН -->
+  <div id="pageShop" class="page-content hidden">
+    <div class="card"><div class="card-title">🛍️ Магазин привилегий</div><div id="shopList"></div></div>
+
+    <!-- ВЛАДЕЛЕЦ: управление товарами -->
+    <div class="card owner-only hidden" id="ownerShopManager" style="border:2px dashed #fbbf24;">
+      <div class="flex"><i class="fas fa-star" style="color:#fbbf24;"></i> <b>Владелец: управление товарами</b></div>
+      <div class="flex">
+        <input type="text" id="newShopName" placeholder="Название привилегии" style="flex:1;">
+        <input type="number" id="newShopPrice" placeholder="Цена" style="width:80px;">
+      </div>
+      <button class="btn btn-sm" id="addShopBtn"><i class="fas fa-plus"></i> Добавить товар</button>
+      <hr style="margin:0.5rem 0;">
+      <div id="shopManageList"></div>
+    </div>
+
+    <div id="purchaseReceipt" class="hidden card" style="background:#dbeafe;">
+      <h3>🎉 Привилегия получена!</h3>
+      <p>Покажи этот экран тому, кто выдаёт привилегию.</p>
+      <p style="font-style:italic;">— Создатель сайта ✨</p>
+      <button class="btn btn-sm" id="closeReceiptBtn">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- РЕЙТИНГ -->
+  <div id="pageRating" class="page-content hidden">
+    <div class="card"><div class="card-title">🏆 Топ учеников</div><div id="topStudents"></div></div>
+    <div class="card"><div class="card-title">📚 Топ классов</div><div id="topClasses"></div></div>
+
+    <!-- ВЛАДЕЛЕЦ: управление учениками -->
+    <div class="card owner-only hidden" id="ownerStudentManager" style="border:2px dashed #fbbf24;">
+      <div class="flex"><i class="fas fa-star" style="color:#fbbf24;"></i> <b>Владелец: управление учениками</b></div>
+      <div id="studentManageList"></div>
+    </div>
+  </div>
+
+  <!-- АДМИН (только для владельца) -->
+  <div id="pageAdmin" class="page-content hidden">
+    <div class="card">
+      <h3>📋 Заявки на проверку</h3>
+      <div id="pendingRequests"></div>
+      <hr class="mt-1"><h3>📜 История заявок</h3>
+      <div id="historyLog"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<script>
+(function() {
+  // ========== НАСТРОЙКИ ВЛАДЕЛЬЦА ==========
+  const OWNER_PASSWORD = '11112222_Aa!';   // ← ПАРОЛЬ ВЛАДЕЛЬЦА (с подчёркиванием)
+  const OWNER_NAME = 'Владелец';
+  const OWNER_CLASS = '10';
+  const SITE_URL = 'https://koelginskaysoshball.netlify.app/';
+
+  // ========== ДАННЫЕ ==========
+  let users = JSON.parse(localStorage.getItem('school_users')) || [];
+  let requests = JSON.parse(localStorage.getItem('school_requests')) || [];
+  let shopItems = JSON.parse(localStorage.getItem('school_shop')) || [
+    { id:1, name:'День без домашнего задания', price:150 },
+    { id:2, name:'Право первым выбрать место', price:50 },
+    { id:3, name:'Анти-двойка (исправление 1)', price:150 },
+  ];
+  let customTasks = JSON.parse(localStorage.getItem('school_custom_tasks')) || [];
+  let currentUser = null;
+  let isAdmin = false;
+
+  const baseTasks = [
+    { value:10, label:'Участие в мероприятии — 10' },
+    { value:20, label:'Помощь в проведении — 20' },
+    { value:30, label:'Победа в конкурсе — 30' },
+    { value:15, label:'Дежурство/субботник — 15' },
+    { value:15, label:'Доброе дело — 15' },
+    { value:5,  label:'Бонус от учителя (5-10) — 5' },
+    { value:15, label:'Дежурство (за неделю) — 15' },
+    { value:10, label:'Отличное поведение (нед.) — 10' },
+    { value:5,  label:'Хорошее поведение (нед.) — 5' },
+  ];
+
+  // ========== МИГРАЦИЯ: чистим старых владельцев ==========
+  users = users.filter(u => {
+    if (u.name === OWNER_NAME && u.class === OWNER_CLASS) {
+      return u.password === OWNER_PASSWORD;
+    }
+    return true;
+  });
+  if (!users.some(u => u.name === OWNER_NAME && u.class === OWNER_CLASS && u.password === OWNER_PASSWORD)) {
+    users.push({ name: OWNER_NAME, class: OWNER_CLASS, password: OWNER_PASSWORD, balance: 0, avatar: null });
+  }
+  const ow = users.find(u => u.password === OWNER_PASSWORD);
+  if (ow) ow.balance = 0;
+  saveData();
+
+  // Восстановление сессии (только обычные ученики)
+  const savedUser = localStorage.getItem('school_current_user');
+  if (savedUser) {
+    try {
+      const p = JSON.parse(savedUser);
+      const f = users.find(u => u.name === p.name && u.class === p.class && u.password !== OWNER_PASSWORD);
+      if (f) currentUser = f;
+    } catch(e) {}
+  }
+
+  function saveData() {
+    localStorage.setItem('school_users', JSON.stringify(users));
+    localStorage.setItem('school_requests', JSON.stringify(requests));
+    localStorage.setItem('school_shop', JSON.stringify(shopItems));
+    localStorage.setItem('school_custom_tasks', JSON.stringify(customTasks));
+    if (currentUser) {
+      localStorage.setItem('school_current_user', JSON.stringify({ name: currentUser.name, class: currentUser.class }));
+    } else {
+      localStorage.removeItem('school_current_user');
+    }
+  }
+
+  function isOwner() { return currentUser && currentUser.password === OWNER_PASSWORD; }
+  function getStudents() { return users.filter(u => u.password !== OWNER_PASSWORD); }
+  function getAllTasks() { return [...baseTasks, ...customTasks]; }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+  }
+
+  function getAvatarSmallHtml(u) {
+    if (u && u.avatar && u.avatar.startsWith('data:image')) {
+      return `<img class="avatar-img" src="${u.avatar}" alt="">`;
+    }
+    return `<span class="avatar-placeholder">👤</span>`;
+  }
+
+  // ========== ШАПКА ==========
+  function renderHeader() {
+    const area = document.getElementById('userArea');
+    if (currentUser) {
+      area.innerHTML = `
+        <div class="user-badge" id="userBadge">${getAvatarSmallHtml(currentUser)}<span>${currentUser.name}</span></div>
+        <button class="btn-auth btn-logout" id="logoutBtn">Выйти</button>
+      `;
+      document.getElementById('logoutBtn').onclick = logout;
+      document.getElementById('userBadge').ondblclick = () => uploadAvatar(currentUser);
+    } else {
+      area.innerHTML = `
+        <button class="btn-auth btn-login" id="loginBtn">Войти</button>
+        <button class="btn-auth btn-register" id="registerBtn">Регистрация</button>
+      `;
+      document.getElementById('loginBtn').onclick = showLoginModal;
+      document.getElementById('registerBtn').onclick = showRegisterModal;
+    }
+  }
+
+  // ========== ВХОД ==========
+  function showLoginModal() {
+    const o = document.createElement('div');
+    o.className = 'modal-overlay';
+    o.innerHTML = `
+      <div class="modal">
+        <h3>🔑 Вход</h3>
+        <label>Имя (ник)</label><input id="loginName" placeholder="Например: Владелец">
+        <label>Класс</label><input id="loginClass" placeholder="Например: 10">
+        <label>Пароль</label><input id="loginPass" type="password">
+        <div class="flex mt-1">
+          <button class="btn" id="loginSubmit">Войти</button>
+          <button class="btn btn-danger" id="loginCancel">Отмена</button>
+        </div>
+      </div>`;
+    document.body.appendChild(o);
+    o.querySelector('#loginCancel').onclick = () => o.remove();
+    o.querySelector('#loginSubmit').onclick = () => {
+      const name = o.querySelector('#loginName').value.trim();
+      const cls = o.querySelector('#loginClass').value.trim();
+      const pass = o.querySelector('#loginPass').value;
+      if (!name || !cls || !pass) { showToast('Заполните все поля'); return; }
+
+      const user = users.find(u => u.name === name && u.class === cls);
+      if (!user) { showToast('Ученик не зарегистрирован'); return; }
+      if (user.password !== pass) { showToast('Неверный пароль'); return; }
+
+      currentUser = user;
+      saveData();
+      o.remove();
+      updateUI();
+      showToast('Добро пожаловать, ' + user.name);
+    };
+  }
+
+  // ========== РЕГИСТРАЦИЯ ==========
+  function showRegisterModal() {
+    const o = document.createElement('div');
+    o.className = 'modal-overlay';
+    o.innerHTML = `
+      <div class="modal">
+        <h3>✨ Регистрация</h3>
+        <label>Имя (ник)</label><input id="regName" placeholder="Например: Иван">
+        <label>Класс</label><input id="regClass" placeholder="Например: 10">
+        <label>Придумайте пароль</label><input id="regPass" type="password">
+        <div class="flex mt-1">
+          <button class="btn btn-success" id="regSubmit">Зарегистрироваться</button>
+          <button class="btn btn-danger" id="regCancel">Отмена</button>
+        </div>
+      </div>`;
+    document.body.appendChild(o);
+    o.querySelector('#regCancel').onclick = () => o.remove();
+    o.querySelector('#regSubmit').onclick = () => {
+      const name = o.querySelector('#regName').value.trim();
+      const cls = o.querySelector('#regClass').value.trim();
+      const pass = o.querySelector('#regPass').value;
+      if (!name || !cls || !pass) { showToast('Заполните все поля'); return; }
+      if (users.find(u => u.name === name && u.class === cls)) {
+        showToast('Такой ученик уже есть — войдите');
+        return;
+      }
+      const newUser = { name, class: cls, password: pass, balance: 0, avatar: null };
+      users.push(newUser);
+      currentUser = newUser;
+      saveData();
+      o.remove();
+      updateUI();
+      showToast('Регистрация успешна!');
+    };
+  }
+
+  function uploadAvatar(user) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+      const file = this.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = e => {
+        user.avatar = e.target.result;
+        saveData();
+        updateUI();
+        showToast('Аватарка обновлена!');
+      };
+      r.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  function logout() {
+    currentUser = null;
+    isAdmin = false;
+    localStorage.removeItem('school_current_user');
+    updateUI();
+    showToast('Вы вышли');
+  }
+
+  // ========== ВКЛАДКИ ==========
+  function renderTabs() {
+    const tabs = document.getElementById('navTabs');
+    const items = [
+      { tab:'home',   icon:'fa-home',        name:'Главная' },
+      { tab:'earn',   icon:'fa-plus-circle', name:'Заработать' },
+      { tab:'shop',   icon:'fa-store',       name:'Магазин' },
+      { tab:'rating', icon:'fa-trophy',      name:'Рейтинг' },
+    ];
+    if (isOwner()) items.push({ tab:'admin', icon:'fa-user-shield', name:'Админ' });
+
+    const active = document.querySelector('.tab-btn.active')?.dataset.tab || 'home';
+    tabs.innerHTML = items.map(i => 
+      `<button class="tab-btn ${i.tab === active ? 'active' : ''}" data-tab="${i.tab}"><i class="fas ${i.icon}"></i> ${i.name}</button>`
+    ).join('');
+    tabs.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    const pages = { home:'pageHome', earn:'pageEarn', shop:'pageShop', rating:'pageRating', admin:'pageAdmin' };
+    Object.values(pages).forEach(id => document.getElementById(id).classList.add('hidden'));
+    if (pages[tab]) document.getElementById(pages[tab]).classList.remove('hidden');
+    updateUI();
+  }
+
+  // ========== ОБНОВЛЕНИЕ UI ==========
+  function updateUI() {
+    renderHeader();
+    renderTabs();
+
+    // Показ/скрытие блоков владельца
+    document.querySelectorAll('.owner-only').forEach(el => {
+      el.classList.toggle('hidden', !isOwner());
+    });
+
+    if (currentUser) {
+      document.getElementById('greetName').innerText = currentUser.name;
+      document.getElementById('balanceDisplay').innerText = currentUser.balance || 0;
+      document.getElementById('classBadge').innerText = currentUser.class;
+    } else {
+      document.getElementById('greetName').innerText = 'гость';
+      document.getElementById('balanceDisplay').innerText = '0';
+      document.getElementById('classBadge').innerText = '—';
+    }
+
+    renderTaskSelect();
+    renderTaskList();
+    renderShop();
+    renderShopManageList();
+    renderRating();
+    renderStudentManageList();
+    renderHistory();
+    if (isOwner()) renderAdminPanel();
+  }
+
+  // ========== ЗАДАНИЯ ==========
+  function renderTaskSelect() {
+    const sel = document.getElementById('taskType');
+    if (!sel) return;
+    sel.innerHTML = getAllTasks().map(t => `<option value="${t.value}">${t.label}</option>`).join('');
+  }
+
+  function renderTaskList() {
+    const c = document.getElementById('taskList');
+    if (!c) return;
+    if (customTasks.length === 0) { c.innerHTML = '<p class="text-muted">Нет добавленных заданий</p>'; return; }
+    c.innerHTML = customTasks.map((t, i) => `
+      <div class="task-item"><span>${t.label}</span>
+      <button class="btn btn-danger btn-sm" data-i="${i}"><i class="fas fa-trash"></i></button></div>
+    `).join('');
+    c.querySelectorAll('button[data-i]').forEach(b => {
+      b.onclick = () => {
+        if (confirm('Удалить задание?')) {
+          customTasks.splice(parseInt(b.dataset.i), 1);
+          saveData(); updateUI(); showToast('Задание удалено');
+        }
+      };
+    });
+  }
+
+  // ========== МАГАЗИН ==========
+  function renderShop() {
+    const c = document.getElementById('shopList');
+    if (!c) return;
+    if (shopItems.length === 0) { c.innerHTML = '<p class="text-muted">Товаров нет</p>'; return; }
+    c.innerHTML = shopItems.map(item => {
+      const canBuy = currentUser && (currentUser.balance || 0) >= item.price;
+      return `<div class="card" style="background:white;padding:0.8rem;">
+        <div class="flex" style="justify-content:space-between;"><b>${item.name}</b><span>${item.price} б.</span></div>
+        <button class="btn btn-sm" data-id="${item.id}" ${!canBuy ? 'disabled style="opacity:0.5"' : ''}>${canBuy ? 'Купить' : 'Не хватает'}</button>
+      </div>`;
+    }).join('');
+    c.querySelectorAll('button[data-id]').forEach(b => {
+      b.onclick = () => {
+        const item = shopItems.find(i => i.id === parseInt(b.dataset.id));
+        if (!item || !currentUser || currentUser.balance < item.price) return;
+        currentUser.balance -= item.price;
+        saveData(); updateUI();
+        document.getElementById('purchaseReceipt').classList.remove('hidden');
+        showToast('Куплено: ' + item.name);
+      };
+    });
+  }
+
+  function renderShopManageList() {
+    const c = document.getElementById('shopManageList');
+    if (!c) return;
+    if (shopItems.length === 0) { c.innerHTML = '<p class="text-muted">Товаров нет</p>'; return; }
+    c.innerHTML = shopItems.map((item, i) => `
+      <div class="shop-item"><div><b>${item.name}</b> — ${item.price} б.</div>
+      <button class="btn btn-danger btn-sm" data-i="${i}"><i class="fas fa-trash"></i></button></div>
+    `).join('');
+    c.querySelectorAll('button[data-i]').forEach(b => {
+      b.onclick = () => {
+        if (confirm('Удалить товар?')) {
+          shopItems.splice(parseInt(b.dataset.i), 1);
+          saveData(); updateUI(); showToast('Товар удалён');
+        }
+      };
+    });
+  }
+
+  // ========== УЧЕНИКИ ==========
+  function renderStudentManageList() {
+    const c = document.getElementById('studentManageList');
+    if (!c) return;
+    const students = getStudents();
+    if (students.length === 0) { c.innerHTML = '<p class="text-muted">Нет учеников</p>'; return; }
+    c.innerHTML = students.map(u => `
+      <div class="student-item">
+        <span>${getAvatarSmallHtml(u)} ${u.name} (${u.class}) — ${u.balance || 0} б.</span>
+        <button class="btn btn-danger btn-sm" data-name="${u.name}" data-class="${u.class}">
+          <i class="fas fa-user-minus"></i>
+        </button>
+      </div>
+    `).join('');
+    c.querySelectorAll('button[data-name]').forEach(b => {
+      b.onclick = () => {
+        const name = b.dataset.name, cls = b.dataset.class;
+        if (confirm(`Удалить ученика "${name}" (${cls})?`)) {
+          const idx = users.findIndex(u => u.name === name && u.class === cls);
+          if (idx !== -1) {
+            users.splice(idx, 1);
+            requests = requests.filter(r => !(r.user === name && r.class === cls));
+            saveData(); updateUI(); showToast(`Ученик ${name} удалён`);
+          }
+        }
+      };
+    });
+  }
+
+  // ========== РЕЙТИНГ ==========
+  function renderRating() {
+    const students = getStudents();
+    const sorted = [...students].sort((a,b) => (b.balance||0) - (a.balance||0));
+    const ts = document.getElementById('topStudents');
+    if (sorted.length === 0) ts.innerHTML = '<p class="text-muted">Нет учеников</p>';
+    else ts.innerHTML = sorted.slice(0,10).map((u,i) =>
+      `<div class="flex" style="justify-content:space-between;border-bottom:1px solid #eee;padding:0.3rem 0;">
+        <span>${getAvatarSmallHtml(u)} ${i+1}. ${u.name} (${u.class})</span><span>${u.balance||0} б.</span>
+      </div>`
+    ).join('');
+
+    const cm = {};
+    students.forEach(u => cm[u.class] = (cm[u.class] || 0) + (u.balance || 0));
+    const sc = Object.entries(cm).sort((a,b) => b[1] - a[1]);
+    const tc = document.getElementById('topClasses');
+    if (sc.length === 0) tc.innerHTML = '<p class="text-muted">Нет классов</p>';
+    else tc.innerHTML = sc.map(([cls, sum], i) =>
+      `<div class="flex" style="justify-content:space-between;border-bottom:1px solid #eee;padding:0.3rem 0;">
+        <span>${i+1}. ${cls}</span><span>${sum} б.</span>
+      </div>`
+    ).join('');
+  }
+
+  function renderHistory() {
+    const last = document.getElementById('lastTransaction');
+    const approved = requests.filter(r => r.status === 'approved').slice(-3);
+    last.innerText = approved.length ? approved.map(r => `${r.user} (+${r.type})`).join(' · ') : '—';
+  }
+
+  // ========== АДМИН ==========
+  function renderAdminPanel() {
+    if (!isOwner()) return;
+    const pending = requests.filter(r => r.status === 'pending');
+    const c = document.getElementById('pendingRequests');
+    if (pending.length === 0) c.innerHTML = '<p class="text-muted">Нет заявок</p>';
+    else {
+      c.innerHTML = pending.map(r => `
+        <div class="card" style="background:white;">
+          <div><b>${r.user}</b> (${r.class})</div>
+          <div>${r.desc} · ${r.type} б.</div>
+          <div class="flex">
+            <button class="btn btn-success btn-sm" data-ok="${r.id}">✅ Начислить</button>
+            <button class="btn btn-danger btn-sm" data-no="${r.id}">❌ Отклонить</button>
+          </div>
+        </div>
+      `).join('');
+      c.querySelectorAll('button[data-ok]').forEach(b => {
+        b.onclick = () => {
+          const req = requests.find(r => r.id === parseInt(b.dataset.ok));
+          if (!req) return;
+          req.status = 'approved'; req.moderator = 'Владелец';
+          const user = users.find(u => u.name === req.user && u.class === req.class);
+          if (user) user.balance = (user.balance || 0) + req.type;
+          saveData(); updateUI(); showToast('Баллы начислены');
+        };
+      });
+      c.querySelectorAll('button[data-no]').forEach(b => {
+        b.onclick = () => {
+          const req = requests.find(r => r.id === parseInt(b.dataset.no));
+          if (!req) return;
+          req.status = 'rejected'; req.moderator = 'Владелец';
+          saveData(); updateUI(); showToast('Заявка отклонена');
+        };
+      });
+    }
+    const hist = requests.filter(r => r.status !== 'pending');
+    const h = document.getElementById('historyLog');
+    if (hist.length === 0) h.innerHTML = '<p class="text-muted">История пуста</p>';
+    else h.innerHTML = hist.map(r =>
+      `<div class="history-item">${r.user} (${r.class}) · ${r.desc} · ${r.type} б. <span class="badge">${r.status}</span></div>`
+    ).join('');
+  }
+
+  // ========== КНОПКИ ==========
+  document.getElementById('submitEarnBtn').onclick = () => {
+    if (!currentUser) { showToast('Сначала войдите'); return; }
+    const type = parseInt(document.getElementById('taskType').value);
+    const desc = document.getElementById('taskDesc').value.trim();
+    const photo = document.getElementById('photoInput').files[0];
+    if (!desc) { showToast('Напишите описание'); return; }
+    if (!photo) { showToast('Загрузите фото'); return; }
+    requests.push({ id: Date.now(), user: currentUser.name, class: currentUser.class, type, desc, photo: '📸', status: 'pending', timestamp: new Date().toLocaleString(), moderator: null });
+    saveData();
+    document.getElementById('taskDesc').value = '';
+    document.getElementById('photoInput').value = '';
+    document.getElementById('photoLabel').innerText = 'Нажми, чтобы загрузить фото';
+    showToast('Заявка отправлена');
+  };
+
+  document.getElementById('photoUpload').onclick = () => document.getElementById('photoInput').click();
+  document.getElementById('photoInput').onchange = function() {
+    if (this.files[0]) document.getElementById('photoLabel').innerText = '📷 Фото загружено';
+  };
+  document.getElementById('closeReceiptBtn').onclick = () => document.getElementById('purchaseReceipt').classList.add('hidden');
+
+  document.getElementById('addTaskBtn').onclick = () => {
+    if (!isOwner()) { showToast('Только владелец'); return; }
+    const name = document.getElementById('newTaskName').value.trim();
+    const points = parseInt(document.getElementById('newTaskPoints').value);
+    if (!name || !points) { showToast('Заполните поля'); return; }
+    customTasks.push({ value: points, label: `${name} — ${points}` });
+    saveData();
+    document.getElementById('newTaskName').value = '';
+    document.getElementById('newTaskPoints').value = '';
+    updateUI(); showToast('Задание добавлено');
+  };
+
+  document.getElementById('addShopBtn').onclick = () => {
+    if (!isOwner()) { showToast('Только владелец'); return; }
+    const name = document.getElementById('newShopName').value.trim();
+    const price = parseInt(document.getElementById('newShopPrice').value);
+    if (!name || !price) { showToast('Заполните поля'); return; }
+    const newId = shopItems.length ? Math.max(...shopItems.map(i => i.id)) + 1 : 1;
+    shopItems.push({ id: newId, name, price });
+    saveData();
+    document.getElementById('newShopName').value = '';
+    document.getElementById('newShopPrice').value = '';
+    updateUI(); showToast('Товар добавлен');
+  };
+
+  // ========== QR ==========
+  function generateQR() {
+    const c = document.getElementById('qrcode');
+    if (!c) return;
+    c.innerHTML = '';
+    try {
+      new QRCode(c, { text: SITE_URL, width: 140, height: 140, correctLevel: QRCode.CorrectLevel.H });
+    } catch(e) {
+      c.innerHTML = `<div style="padding:20px;background:white;border-radius:12px;font-size:0.8rem;">${SITE_URL}</div>`;
+    }
+  }
+
+  // ========== СТАРТ ==========
+  updateUI();
+  generateQR();
+})();
+</script>
+</body>
+</html>
